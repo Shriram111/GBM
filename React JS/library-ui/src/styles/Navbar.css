@@ -1,0 +1,131 @@
+/* Navbar.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+.navbar {
+  background: #0d1117; /* GitHub-style deep dark */
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  border-bottom: 1px solid #30363d;
+  font-family: 'Inter', sans-serif;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 30px;
+}
+
+.navbar-logo {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.navbar-logo span {
+  color: #58a6ff; /* Electric Blue accent */
+  font-weight: 400;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  align-items: center;
+}
+
+.nav-item {
+  position: relative;
+  margin-left: 20px;
+}
+
+.nav-links {
+  color: #c9d1d9;
+  text-decoration: none;
+  padding: 10px 15px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.nav-links:hover {
+  color: #58a6ff;
+}
+
+/* Dark Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #161b22;
+  min-width: 220px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 10px 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  list-style: none;
+}
+
+.dropdown-menu li a {
+  padding: 12px 20px;
+  display: block;
+  color: #c9d1d9;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.dropdown-menu li a:hover {
+  background: #21262d;
+  color: #58a6ff;
+}
+
+/* Add this to your existing Navbar.css */
+
+.admin-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f0f6fc !important; /* Brighter text for visibility */
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 6px 12px !important;
+    transition: all 0.3s ease;
+  }
+  
+  .admin-link:hover {
+    background: #21262d;
+    border-color: #8b949e;
+    color: #58a6ff !important; /* Electric Blue on hover */
+  }
+  
+  .admin-icon {
+    font-size: 1.1rem;
+    filter: grayscale(100%); /* Keeps it subtle in the dark theme */
+    transition: 0.3s;
+  }
+  
+  .admin-link:hover .admin-icon {
+    filter: grayscale(0%); /* Brings color back on hover */
+  }
+  
+  /* Ensure the navbar items don't get squashed */
+  .nav-menu {
+    gap: 10px;
+  }
+
+/* Styled Action Button */
+.nav-btn {
+  background: #238636 !important; /* Success Green for 'Get Started' */
+  color: white !important;
+  border-radius: 6px;
+  padding: 8px 18px !important;
+  font-weight: 600;
+}
