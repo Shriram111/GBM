@@ -1,0 +1,46 @@
+package com.example.demo.Controller;
+
+import com.example.demo.Entity.Habit;
+import com.example.demo.Repository.HabitRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/habits")
+@CrossOrigin(origins = "*")
+public class HabitController {
+
+    @Autowired 
+    private HabitRepository habitRepo;
+
+    // Fixed: Get habits for a specific user
+    @GetMapping("/{userId}")
+    public List<Habit> getHabits(@PathVariable Long userId) {
+        return habitRepo.findByUserId(userId);
+    }
+
+    @PostMapping("/add")
+    public Habit addHabit(@RequestBody Habit habit) {
+        return habitRepo.save(habit);
+    }
+
+    @PutMapping("/toggle/{id}")
+    public Habit toggleHabit(@PathVariable Long id) {
+        Habit habit = habitRepo.findById(id).orElseThrow();
+        habit.setCompletedToday(!habit.isCompletedToday());
+        
+        if (habit.isCompletedToday()) {
+            habit.setCurrentStreak(habit.getCurrentStreak() + 1);
+        } else {
+            habit.setCurrentStreak(Math.max(0, habit.getCurrentStreak() - 1));
+        }
+        
+        return habitRepo.save(habit);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteHabit(@PathVariable Long id) {
+        habitRepo.deleteById(id);
+    }
+}

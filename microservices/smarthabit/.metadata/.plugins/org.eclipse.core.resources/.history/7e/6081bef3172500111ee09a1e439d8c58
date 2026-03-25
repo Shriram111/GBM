@@ -1,0 +1,49 @@
+package com.example.demo.Controller;
+
+import com.example.demo.Entity.Habit;
+import com.example.demo.Repository.HabitRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/habits")
+@CrossOrigin(origins = "*") // Allows your mobile app to connect
+public class HabitController {
+
+    @Autowired 
+    private HabitRepository habitRepo;
+
+    // 1. Get ALL habits (Prevents 404 if no ID is sent)
+    @GetMapping
+    public List<Habit> getAllHabits() {
+        return habitRepo.findAll();
+    }
+
+    // 2. Get habits for a specific user
+    @GetMapping("/{userId}")
+    public List<Habit> getHabits(@PathVariable Long userId) {
+        return habitRepo.findByUserId(userId);
+    }
+
+    // 3. Add a new habit
+    @PostMapping("/add")
+    public Habit addHabit(@RequestBody Habit habit) {
+        return habitRepo.save(habit);
+    }
+
+    // 4. Toggle completion
+    @PutMapping("/toggle/{id}")
+    public Habit toggleHabit(@PathVariable Long id) {
+        Habit habit = habitRepo.findById(id).orElseThrow();
+        habit.setCompletedToday(!habit.isCompletedToday());
+        
+        if (habit.isCompletedToday()) {
+            habit.setCurrentStreak(habit.getCurrentStreak() + 1);
+        } else {
+            habit.setCurrentStreak(Math.max(0, habit.getCurrentStreak() - 1));
+        }
+        
+        return habitRepo.save(habit);
+    }
+}

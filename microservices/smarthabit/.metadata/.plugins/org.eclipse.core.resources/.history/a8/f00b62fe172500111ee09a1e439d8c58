@@ -1,0 +1,105 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+
+// Sample of the 100+ Suggestions
+const SUGGESTED_HABITS = [
+  { id: 's1', name: 'Drink 2L Water', cat: 'Health' },
+  { id: 's2', name: 'Read 10 Pages', cat: 'Growth' },
+  { id: 's3', name: 'Write Code', cat: 'Career' },
+  { id: 's4', name: '10 Min Meditation', cat: 'Mindset' },
+  { id: 's5', name: 'No Sugar', cat: 'Diet' },
+  { id: 's6', name: 'Morning Run', cat: 'Fitness' },
+  { id: 's7', name: 'Journaling', cat: 'Mental' },
+  { id: 's8', name: 'Sleep 8 Hours', cat: 'Health' },
+];
+
+export default function HomeScreen() {
+  const [habits, setHabits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  const API_BASE = 'http://10.124.220.157:8080/api/habits';
+  const USER_ID = 1; 
+
+  const fetchHabits = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/${USER_ID}`);
+      const data = await response.json();
+      setHabits(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Fetch Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addHabitFromSuggestion = async (name: string, category: string) => {
+    try {
+      await fetch(`${API_BASE}/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category, userId: USER_ID, currentStreak: 0, completedToday: false }),
+      });
+      fetchHabits(); // Refresh list
+    } catch (e) { Alert.alert("Error", "Could not add habit"); }
+  };
+
+  useEffect(() => { fetchHabits(); }, []);
+
+  if (loading) return <View style={styles.darkContainer}><ActivityIndicator size="large" color="#6366f1" /></View>;
+
+  return (
+    <View style={styles.darkContainer}>
+      <Text style={styles.mainTitle}>Habit Tracker</Text>
+
+      {habits.length === 0 ? (
+        <View style={{flex: 1}}>
+          <Text style={styles.sectionTitle}>Suggested for You</Text>
+          <FlatList
+            data={SUGGESTED_HABITS}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.sugCard} onPress={() => addHabitFromSuggestion(item.name, item.cat)}>
+                <Text style={styles.catLabel}>{item.cat}</Text>
+                <Text style={styles.sugName}>{item.name}</Text>
+                <Text style={styles.addLabel}>+ Add</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      ) : (
+        <FlatList
+          data={habits}
+          // THE CRASH FIX: Optional chaining and index fallback
+          keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.habitItem}>
+              <View>
+                <Text style={styles.habitName}>{item?.name ?? "New Habit"}</Text>
+                <Text style={styles.habitStreak}>🔥 {item?.currentStreak ?? 0} Days</Text>
+              </View>
+              <TouchableOpacity style={[styles.checkCircle, item?.completedToday && styles.checkedCircle]}>
+                {item?.completedToday && <Text style={{color: '#fff'}}>✓</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  darkContainer: { flex: 1, backgroundColor: '#0f172a', padding: 20, paddingTop: 60 },
+  mainTitle: { color: '#fff', fontSize: 32, fontWeight: '900', marginBottom: 20 },
+  sectionTitle: { color: '#94a3b8', fontSize: 18, marginBottom: 15 },
+  habitItem: { backgroundColor: '#1e293b', padding: 20, borderRadius: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  habitName: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  habitStreak: { color: '#6366f1', marginTop: 4 },
+  checkCircle: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: '#6366f1', justifyContent: 'center', alignItems: 'center' },
+  checkedCircle: { backgroundColor: '#6366f1' },
+  sugCard: { backgroundColor: '#1e293b', flex: 1, margin: 6, padding: 15, borderRadius: 15, borderLeftWidth: 4, borderLeftColor: '#6366f1' },
+  catLabel: { color: '#6366f1', fontSize: 10, fontWeight: 'bold', marginBottom: 4 },
+  sugName: { color: '#fff', fontWeight: 'bold' },
+  addLabel: { color: '#94a3b8', fontSize: 11, marginTop: 8 }
+});
